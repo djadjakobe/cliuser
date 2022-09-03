@@ -1,0 +1,41 @@
+#!/bin/bash
+#author : peguy yandja
+#creation date : 08/31/2022
+#last modified : 08/31/2022
+#script description : this a IAM practice script
+#script usage : this is for policy,user and group creation
+
+read -p " Enter a group name : "  global_name
+read -p " Enter a user_name : "  user_name_global
+read -p " Enter a password " -s user_pass
+
+echo " creating group "
+echo
+echo
+aws iam create-group --group-name $global_name
+sleep 3
+echo " creating user "
+echo
+aws iam create-user --user-name $user_name_global
+sleep 3
+echo " creating password "
+echo
+aws iam create-login-profile --user-name $user_name_global --password $user_pass --password-reset-required
+sleep 3
+echo
+echo   " adding user to group"
+aws iam add-user-to-group --user-name $user_name_global --group-name $global_name
+sleep 3
+echo
+echo
+touch policy1
+echo
+echo  " creating policy  "
+aws iam create-policy --policy-name $global_name --policy-document file://policy1.json > data.json 
+policyArn=`jq -r '.Policy.Arn' data.json `
+sleep 3
+echo
+echo "attaching policy to group"
+
+echo $policyArn
+aws iam attach-group-policy --policy-arn $policyArn --group-name $global_name
